@@ -1,10 +1,68 @@
 import Vue from "vue";
 import App from "./App.vue";
-import router from "./router";
+import router from "./router/index.js";
+import jQuery from 'jquery';
+import {fb} from './firebase.js';
+import VueFirestore from 'vue-firestore';
+import VueCarousel from 'vue-carousel';
+
+Vue.use(VueCarousel);
+
+require('firebase/firestore')
+
+
+import Vue2Filters from 'vue2-filters'
+Vue.use(Vue2Filters)
+
+Vue.use(VueFirestore, {
+  key: 'id',
+  enumerable: true
+})
+
+
+Vue.use(VueFirestore)
+
+
+window.$ = window.jQuery = jQuery;
+
+import 'popper.js';
+import 'bootstrap';
+import './assets/app.scss';
+import Swal from 'sweetalert2'
+window.Swal = Swal;
+
+import store from './store.js';
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+})
+
+window.Toast = Toast;
+
+Vue.component('Navbar', require('./components/Navbar.vue').default);
+Vue.component('add-to-cart', require('./components/AddToCart.vue').default);
+Vue.component('products-list', require('./sections/ProductList.vue').default);
+Vue.component('mini-cart', require('./components/MiniCart.vue').default);
 
 Vue.config.productionTip = false;
 
-new Vue({
+
+let app ='';
+
+fb.auth().onAuthStateChanged(function(user) {
+  if (!app) {
+  new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount("#app");
+  } 
+});
